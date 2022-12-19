@@ -1,7 +1,6 @@
 select a.id,
        a.first_name,
        a.last_name,
-       a.role_id,
        title,
        department.name as department,
        salary,
