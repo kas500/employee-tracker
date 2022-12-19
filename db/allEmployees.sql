@@ -1,3 +1,4 @@
+-- select all employees
 select a.id,
        a.first_name,
        a.last_name,
