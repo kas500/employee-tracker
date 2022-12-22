@@ -28,6 +28,7 @@ async function init() {
                           questions[20],
                           questions[21],
                           questions[22],
+                          questions[23],
                           questions[8],]
             }
         ]
@@ -59,7 +60,9 @@ async function init() {
             case questions[21]:
                 return removeRoleById();  
             case questions[22]:
-                return removeEmployeeById();      
+                return removeEmployeeById();   
+            case questions[23]:
+                return viewTotalBudgetByDepId();        
             case questions[8]:
                 console.clear();
                 process.exit();         
@@ -341,6 +344,29 @@ async function removeEmployeeById() {
     .then(async answers =>{
         await dataFromDb.deleteEmployeeById(answers.employeeId);
         init();
+    }
+        )
+}
+
+//view total budget for dep
+async function viewTotalBudgetByDepId() {
+    const departments =  await dataFromDb.getAllDepartments();
+    const departmentsOptions = departments.map(({ id, name }) => ({ name: name, value: id }));
+    inquirer.prompt(
+        [
+            {   
+                type: 'list',
+                message: "Select the department",
+                name: 'departmentId',
+                choices: departmentsOptions,
+            },
+        ]
+    )
+    .then(async answers =>{
+        const budget = await dataFromDb.viewTotalBudget(answers.departmentId);
+        console.table(budget);
+        init();
+
     }
         )
 }
