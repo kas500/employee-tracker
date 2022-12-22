@@ -32,6 +32,11 @@ class QueryFrom{
         return await this.db.query('select * from role;');
     }
 
+    //insert to department
+    async insertToDepartment(department){
+        return await this.db.query(`insert into department (name) values ("${department.getName()}")`);
+    }
+
 }   
 
 module.exports = new QueryFrom(db);
