@@ -57,6 +57,16 @@ class QueryFrom{
         return await this.db.query("select id, concat(first_name,' ',last_name) as name  from employee where manager_id is NULL ");
     }
 
+    //select and concat all Employees (first and last name)
+    async getListOfEmployeesNames(){
+        return await this.db.query("select id, concat(first_name,' ',last_name) as name  from employee");
+    }
+
+    //update role for Employee
+    async updateRoleForEmployee(employeeId,roleId){
+        return await this.db.query(`update employee set role_id=${roleId} where employee.id=${employeeId}`);
+    }
+
 }   
 
 module.exports = new QueryFrom(db);
