@@ -29,12 +29,17 @@ class QueryFrom{
 
     //get all roles
     async getAllRoles(){
-        return await this.db.query('select * from role;');
+        return await this.db.query('select role.id, title, salary, department.name as department from role inner join department on department.id = role.department_id;');
     }
 
     //insert to department
     async insertToDepartment(department){
         return await this.db.query(`insert into department (name) values ("${department.getName()}")`);
+    }
+
+    //insert to role
+    async insertToRole(role){
+        return  await this.db.query(`insert into role (title, salary, department_id) values ("${role.getTitle()}","${role.getSalary()}","${role.getDepartmentId()}")`);
     }
 
 }   
