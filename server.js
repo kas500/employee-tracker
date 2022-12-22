@@ -3,6 +3,7 @@ const cTable = require('console.table');
 const inquirer = require('inquirer');
 const {questions} = require('./js/helper');
 const Department = require('./lib/Deparment');
+const Role = require('./lib/Role');
 
 async function init() {
     inquirer.prompt(
@@ -32,6 +33,8 @@ async function init() {
                 return viewAllEmployees();
             case questions[4]:
                 return addDepartment();    
+            case questions[5]:
+                return addRole();     
             default:
                 break;
         }
@@ -40,25 +43,28 @@ async function init() {
 
 init();
 
-
+//view employees
 async function viewAllEmployees(){
     const employees = await dataFromDb.getAllEmployees();
     console.table(employees);
     init();
 }
 
+//view deps
 async function viewAllDepartments(){
     const departments = await dataFromDb.getAllDepartments();
     console.table(departments);
     init();
 }
 
+//view roles
 async function viewAllRoles(){
-    const roles = await dataFromDb.getAllDepartments();
+    const roles = await dataFromDb.getAllRoles();
     console.table(roles);
     init();
 }
 
+//add dep
 async function addDepartment(){
     inquirer.prompt(
         [
@@ -75,5 +81,33 @@ async function addDepartment(){
     })
 
 }
-
+//add role
+async function addRole(){
+    let departments =  await dataFromDb.getAllDepartments();
+    departmentsOptions = departments.map(({ id, name }) => ({ name: name, value: id }));
+    inquirer.prompt(
+        [
+            {
+                type: 'input',
+                message: questions[10],
+                name: 'title',
+            },
+            {
+                type: 'input',
+                message: questions[11],
+                name: 'salary',
+            },
+            {
+                type: 'list',
+                message: questions[12],
+                name: 'depId',
+                choices: departmentsOptions,
+            }
+        ]
+    )
+    .then(answer =>{
+        dataFromDb.insertToRole(new Role(answer.title, answer.salary, answer.depId))
+        init();
+    })
+}
 
