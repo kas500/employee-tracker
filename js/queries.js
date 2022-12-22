@@ -39,7 +39,22 @@ class QueryFrom{
 
     //insert to role
     async insertToRole(role){
-        return  await this.db.query(`insert into role (title, salary, department_id) values ("${role.getTitle()}","${role.getSalary()}","${role.getDepartmentId()}")`);
+        return  await this.db.query(
+        `insert into role (title, salary, department_id) 
+        values ("${role.getTitle()}","${role.getSalary()}","${role.getDepartmentId()}")`);
+    }
+
+    //insert to employee
+    async insertToEmployee(employee){
+        return await this.db.query(
+        `insert into employee (first_name, last_name, role_id, manager_id)
+        values ("${employee.getFirstName()}","${employee.getLastName()}","${employee.getRoleId()}",${(!null)?employee.getManagerId():NULL})`
+        );
+    }
+
+    //select managers
+    async getAllManagers(){
+        return await this.db.query("select id, concat(first_name,' ',last_name) as name  from employee where manager_id is NULL ");
     }
 
 }   
