@@ -11,8 +11,8 @@ const db = mysql.createConnection(
     database: "mycompany_db",
   },
 );
-db.connect();
 
+db.connect();
 db.query = util.promisify(db.query);
 
 module.exports = {
