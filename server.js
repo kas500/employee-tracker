@@ -4,6 +4,7 @@ const inquirer = require('inquirer');
 const {questions} = require('./js/helper');
 const Department = require('./lib/Deparment');
 const Role = require('./lib/Role');
+const Employee = require("./lib/Employee");
 
 async function init() {
     inquirer.prompt(
@@ -34,7 +35,9 @@ async function init() {
             case questions[4]:
                 return addDepartment();    
             case questions[5]:
-                return addRole();     
+                return addRole();    
+            case questions[6]:
+                return addEmployee();      
             default:
                 break;
         }
@@ -110,4 +113,44 @@ async function addRole(){
         init();
     })
 }
+
+//add employee
+async function addEmployee(){
+    const managers = await dataFromDb.getAllManagers();
+    managers.push({id:null,name:"None"});
+    managersOptions = managers.map(({ id, name }) => ({ name: name, value: id }));
+    const roles = await dataFromDb.getAllRoles();
+    rolesOptions = roles.map(({ id, title }) => ({ name: title, value: id }));
+    inquirer.prompt(
+        [
+            {
+                type: 'input',
+                message: questions[13],
+                name: 'first_name',
+            },
+            {
+                type: 'input',
+                message: questions[14],
+                name: 'last_name',
+            },
+            {
+                type: 'list',
+                message: questions[15],
+                name: 'role_id',
+                choices: rolesOptions,
+            },
+            {
+                type: 'list',
+                message: questions[16],
+                name: 'manager_id',
+                choices: managersOptions,
+            },
+        ]
+    )
+    .then(answers =>{
+        dataFromDb.insertToEmployee(new Employee(answers.first_name,answers.last_name,answers.role_id, answers.manager_id));
+        init();
+    })
+}
+
 
