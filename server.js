@@ -1,42 +1,10 @@
-const inquirer = require('inquirer');
-const fs = require('fs');
+const dataFromDb = require("./js/queries");
 const cTable = require('console.table');
+const inquirer = require('inquirer');
 const {questions} = require('./js/helper');
-const {db} = require('./js/connection');
-const { clear } = require('console');
-const Department = require('./lib/Deparment');
-const Role = require('./lib/Role');
 
-const departments = "./db/allDepartments.sql";
-const roles = "./db/allRoles.sql";
-const employees = "./db/allEmployees.sql"
-
-//retrieve data from a table
-async function getAllDataFrom(source){
-    fs.readFile(source, 'utf8', function (err, data) {
-        db.query(data, async function (err, results) {
-            console.log("\n");
-            //console.log(results);
-            console.log(cTable.getTable(results));
-            console.log("\n");
-            await questionsHandler();
-        });
-    });
-}
-
-//add department
-async function addDepartment(department){
-        console.log(department.getName());
-        db.query(`insert into department (name) values ("${department.getName()}");`, async function (err, results) {
-            console.log("Department added");
-        });
-}
-
-//
-
-// function handles questions
-async function questionsHandler(){
-    await inquirer.prompt(
+async function init() {
+    inquirer.prompt(
         [
             {
                 type: 'list',
@@ -52,53 +20,41 @@ async function questionsHandler(){
                           questions[8]]
             }
         ]
-
-    ).then(async (answers)=>{
-        if (answers.option !=="Quit") {
-            switch (answers.option) {
-                case questions[1]:
-                    await getAllDataFrom(departments);
-                    await questionsHandler();
-                    break;
-                case questions[2]:
-                    await getAllDataFrom(roles);
-                    await questionsHandler(); 
-                    break;
-                case questions[3]:
-                    await getAllDataFrom(employees);
-                    await questionsHandler(); 
-                    break;
-                case questions[4]:
-                    await inquirer.prompt(
-                        [
-                            {
-                                type: 'input',
-                                message: questions[9],
-                                name: 'depName'
-                            }, 
-                        ]
-                    )
-                    .then(async (answers)=>{
-                        const dep = new Department(answers.depName);
-                        await addDepartment(dep);
-                        await questionsHandler();
-                    })
-                    break;    
-                default:
-                    break;
-            }
-            
+    )
+    .then((answers)=>{
+        switch (answers.option) {
+            case questions[1]:
+                return viewAllDepartments();
+            case questions[2]:
+                return  viewAllRoles();
+            case questions[3]:
+                return viewAllEmployees();
+            default:
+                break;
         }
-        
-        console.clear();
-        
-        process.exit(); 
-        
-    });
-}
-
-async function init(){
-    await questionsHandler();
+            })
 }
 
 init();
+
+
+async function viewAllEmployees(){
+    const employees = await dataFromDb.getAllEmployees();
+    console.table(employees);
+    init();
+}
+
+async function viewAllDepartments(){
+    const departments = await dataFromDb.getAllDepartments();
+    console.table(departments);
+    init();
+}
+
+async function viewAllRoles(){
+    const roles = await dataFromDb.getAllDepartments();
+    console.table(roles);
+    init();
+}
+
+
+
