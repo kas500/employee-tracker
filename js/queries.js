@@ -103,6 +103,16 @@ class QueryFrom{
     async deleteEmployeeById(employeeId){
         return await this.db.query(`delete from employee where id=${employeeId}`);
     }
+
+    //view the total budget of the department
+    async viewTotalBudget(departmentId){
+        return this.db.query(`select 
+            department.name as Department,
+            SUM(salary) as Budget
+            from employee a
+            inner join role on role.id = a.role_id
+            left join department on department.id = role.department_id where department_id=${departmentId}`);
+    }
 }   
 
 module.exports = new QueryFrom(db);
