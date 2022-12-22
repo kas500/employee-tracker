@@ -72,6 +72,24 @@ class QueryFrom{
         return await this.db.query(`update employee set manager_id=${(!null)?managerId:NULL} where employee.id=${employeeId}`);
     }
 
+    //select employees by manager
+    async selectEmployeesByManager(managerId){
+        return await this.db.query(`select employee.id, first_name, last_name from employee where manager_id=${(!null)?managerId:NULL}`);
+    }
+
+    //select employees by department
+    async selectEmployeesByDepartment(departmentId){
+        return await this.db.query(`
+        select a.id,
+        concat(a.first_name,' ',a.last_name) as name,
+        title,
+        department.name as department
+        from employee a
+        left join employee b on b.id = a.manager_id
+        inner join role on role.id = a.role_id
+        join department on department.id = role.department_id where department_id=${departmentId}`);
+    }
+
 
 }   
 
