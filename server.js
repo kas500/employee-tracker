@@ -6,6 +6,7 @@ const Department = require('./lib/Deparment');
 const Role = require('./lib/Role');
 const Employee = require("./lib/Employee");
 const { asyncScheduler } = require("rxjs");
+const { updateEmployeeManager } = require("./js/queries");
 
 async function init() {
     inquirer.prompt(
@@ -21,7 +22,9 @@ async function init() {
                           questions[5],
                           questions[6],
                           questions[7],
-                          questions[8]]
+                          questions[17],
+                          questions[8],
+                          ]
             }
         ]
     )
@@ -40,7 +43,9 @@ async function init() {
             case questions[6]:
                 return addEmployee(); 
             case questions[7]:
-                return updateEmployee();   
+                return updateEmployeeRole();  
+            case questions[17]:
+                return updateManager();       
             case questions[8]:
                 console.clear();
                 process.exit();         
@@ -159,8 +164,8 @@ async function addEmployee(){
     })
 }
 
-//update employee
-async function updateEmployee(){
+//update employee role
+async function updateEmployeeRole(){
     const employees = await dataFromDb.getListOfEmployeesNames();
     const employeesOptions = employees.map(({ id, name }) => ({ name: name, value: id }));
     const roles = await dataFromDb.getAllRoles();
@@ -186,6 +191,38 @@ async function updateEmployee(){
         init();
     }
         )
+}
+
+//update employee manager
+async function updateManager(){
+    const employees = await dataFromDb.getListOfEmployeesNames();
+    const employeesOptions = employees.map(({ id, name }) => ({ name: name, value: id }));
+    const managers = await dataFromDb.getAllManagers();
+    managers.push({id:null,name:"None"});
+    const managersOptions = managers.map(({ id, name }) => ({ name: name, value: id }));
+    inquirer.prompt(
+        [
+            {   
+                type: 'list',
+                message: "Which employee's manager you want to update?",
+                name: 'employeeId',
+                choices: employeesOptions,
+            },
+            {   
+                type: 'list',
+                message: "What manager name do you want to assign to the selected employee?",
+                name: 'managerId',
+                choices: managersOptions,
+            },
+        ]
+    )
+    .then(answers =>{
+        dataFromDb.updateEmployeeManager(answers.employeeId,answers.managerId);
+        init();
+    }
+        )
+
+
 }
 
 
