@@ -90,7 +90,19 @@ class QueryFrom{
         join department on department.id = role.department_id where department_id=${departmentId}`);
     }
 
+    //delete department
+    async deleteDepartmentById(departmentId){
+        return await this.db.query(`delete from department where id=${departmentId}`);
+    }
 
+    //delete role
+    async deleteRoleById(roleId){
+        return await this.db.query(`delete from role where id=${roleId}`);
+    }
+    //delete employee
+    async deleteEmployeeById(employeeId){
+        return await this.db.query(`delete from employee where id=${employeeId}`);
+    }
 }   
 
 module.exports = new QueryFrom(db);
