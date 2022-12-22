@@ -15,7 +15,14 @@ const questions = [
         `Enter the first name`,
         `Enter the last name`,
         `Enter the role`,
-        `Enter the manager`
+        `Enter the manager`,
+        `Update employee manager`,
+        `View employees by manager`,
+        `View employees by department`,
+        `Delete department`,
+        `Delete role`,
+        `Delete employee`,
+        `View total budget for the department`
     ];
 
 module.exports = {
