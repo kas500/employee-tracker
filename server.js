@@ -6,7 +6,7 @@ const Department = require('./lib/Deparment');
 const Role = require('./lib/Role');
 const Employee = require("./lib/Employee");
 const { asyncScheduler } = require("rxjs");
-const { updateEmployeeManager } = require("./js/queries");
+const { updateEmployeeManager, deleteDepartmentById } = require("./js/queries");
 
 async function init() {
     inquirer.prompt(
@@ -25,6 +25,9 @@ async function init() {
                           questions[17],
                           questions[18],
                           questions[19],
+                          questions[20],
+                          questions[21],
+                          questions[22],
                           questions[8],]
             }
         ]
@@ -50,7 +53,13 @@ async function init() {
             case questions[18]:
                 return viewEmployeesByManager();      
             case questions[19]:
-                return viewEmployeesByDepartment();        
+                return viewEmployeesByDepartment();   
+            case questions[20]:
+                return removeDepartmentById();
+            case questions[21]:
+                return removeRoleById();  
+            case questions[22]:
+                return removeEmployeeById();      
             case questions[8]:
                 console.clear();
                 process.exit();         
@@ -268,6 +277,69 @@ async function viewEmployeesByDepartment(){
     .then(async answers =>{
         const employees = await dataFromDb.selectEmployeesByDepartment(answers.departmentId);
         console.table(await employees);
+        init();
+    }
+        )
+}
+
+//delete department by id
+async function removeDepartmentById() {
+    const departments =  await dataFromDb.getAllDepartments();
+    const departmentsOptions = departments.map(({ id, name }) => ({ name: name, value: id }));
+    inquirer.prompt(
+        [
+            {   
+                type: 'list',
+                message: "Select the department",
+                name: 'departmentId',
+                choices: departmentsOptions,
+            },
+        ]
+    )
+    .then(async answers =>{
+        await dataFromDb.deleteDepartmentById(answers.departmentId);
+        init();
+    }
+        )
+}
+
+//delete role by id
+async function removeRoleById() {
+    const roles = await dataFromDb.getAllRoles();
+    rolesOptions = roles.map(({ id, title }) => ({ name: title, value: id }));
+    inquirer.prompt(
+        [
+            {   
+                type: 'list',
+                message: "Select the role",
+                name: 'roleId',
+                choices: rolesOptions,
+            },
+        ]
+    )
+    .then(async answers =>{
+        await dataFromDb.deleteRoleById(answers.roleId);
+        init();
+    }
+        )
+}
+
+//delete employee by id
+async function removeEmployeeById() {
+    const employees = await dataFromDb.getListOfEmployeesNames();
+    const employeesOptions = employees.map(({ id, name }) => ({ name: name, value: id }));
+    inquirer.prompt(
+        [
+            {   
+                type: 'list',
+                message: "Select the employee",
+                name: 'employeeId',
+                choices: employeesOptions,
+            },
+        ]
+    )
+    .then(async answers =>{
+        await dataFromDb.deleteEmployeeById(answers.employeeId);
         init();
     }
         )
