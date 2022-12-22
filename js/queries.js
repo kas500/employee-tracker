@@ -67,6 +67,12 @@ class QueryFrom{
         return await this.db.query(`update employee set role_id=${roleId} where employee.id=${employeeId}`);
     }
 
+    //update employee manager
+    async updateEmployeeManager(employeeId,managerId){
+        return await this.db.query(`update employee set manager_id=${(!null)?managerId:NULL} where employee.id=${employeeId}`);
+    }
+
+
 }   
 
 module.exports = new QueryFrom(db);
