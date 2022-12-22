@@ -5,6 +5,7 @@ const {questions} = require('./js/helper');
 const Department = require('./lib/Deparment');
 const Role = require('./lib/Role');
 const Employee = require("./lib/Employee");
+const { asyncScheduler } = require("rxjs");
 
 async function init() {
     inquirer.prompt(
@@ -37,7 +38,12 @@ async function init() {
             case questions[5]:
                 return addRole();    
             case questions[6]:
-                return addEmployee();      
+                return addEmployee(); 
+            case questions[7]:
+                return updateEmployee();   
+            case questions[8]:
+                console.clear();
+                process.exit();         
             default:
                 break;
         }
@@ -86,8 +92,8 @@ async function addDepartment(){
 }
 //add role
 async function addRole(){
-    let departments =  await dataFromDb.getAllDepartments();
-    departmentsOptions = departments.map(({ id, name }) => ({ name: name, value: id }));
+    const departments =  await dataFromDb.getAllDepartments();
+    const departmentsOptions = departments.map(({ id, name }) => ({ name: name, value: id }));
     inquirer.prompt(
         [
             {
@@ -118,7 +124,7 @@ async function addRole(){
 async function addEmployee(){
     const managers = await dataFromDb.getAllManagers();
     managers.push({id:null,name:"None"});
-    managersOptions = managers.map(({ id, name }) => ({ name: name, value: id }));
+    const managersOptions = managers.map(({ id, name }) => ({ name: name, value: id }));
     const roles = await dataFromDb.getAllRoles();
     rolesOptions = roles.map(({ id, title }) => ({ name: title, value: id }));
     inquirer.prompt(
@@ -151,6 +157,35 @@ async function addEmployee(){
         dataFromDb.insertToEmployee(new Employee(answers.first_name,answers.last_name,answers.role_id, answers.manager_id));
         init();
     })
+}
+
+//update employee
+async function updateEmployee(){
+    const employees = await dataFromDb.getListOfEmployeesNames();
+    const employeesOptions = employees.map(({ id, name }) => ({ name: name, value: id }));
+    const roles = await dataFromDb.getAllRoles();
+    rolesOptions = roles.map(({ id, title }) => ({ name: title, value: id }));
+    inquirer.prompt(
+        [
+            {   
+                type: 'list',
+                message: "Which employee's role you want to update?",
+                name: 'employeeId',
+                choices: employeesOptions,
+            },
+            {   
+                type: 'list',
+                message: "Which role do you want to assign to the selected employee?",
+                name: 'roleId',
+                choices: rolesOptions,
+            },
+        ]
+    )
+    .then(answers =>{
+        dataFromDb.updateRoleForEmployee(answers.employeeId,answers.roleId);
+        init();
+    }
+        )
 }
 
 
