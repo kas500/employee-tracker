@@ -1,5 +1,5 @@
 const mysql = require("mysql2");
-
+const util = require("util");
 // Connect to database
 const db = mysql.createConnection(
   {
@@ -11,6 +11,9 @@ const db = mysql.createConnection(
     database: "mycompany_db",
   },
 );
+db.connect();
+
+db.query = util.promisify(db.query);
 
 module.exports = {
     db
