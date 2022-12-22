@@ -23,8 +23,9 @@ async function init() {
                           questions[6],
                           questions[7],
                           questions[17],
-                          questions[8],
-                          ]
+                          questions[18],
+                          questions[19],
+                          questions[8],]
             }
         ]
     )
@@ -45,7 +46,11 @@ async function init() {
             case questions[7]:
                 return updateEmployeeRole();  
             case questions[17]:
-                return updateManager();       
+                return updateManager();  
+            case questions[18]:
+                return viewEmployeesByManager();      
+            case questions[19]:
+                return viewEmployeesByDepartment();        
             case questions[8]:
                 console.clear();
                 process.exit();         
@@ -224,5 +229,46 @@ async function updateManager(){
 
 
 }
+//view employees by manager
+async function viewEmployeesByManager() {
+    const managers = await dataFromDb.getAllManagers();
+    managers.push({id:null,name:"None"});
+    const managersOptions = managers.map(({ id, name }) => ({ name: name, value: id }));
+    inquirer.prompt(
+        [
+            {   
+                type: 'list',
+                message: "Select the manager",
+                name: 'managerId',
+                choices: managersOptions,
+            },
+        ]
+    )
+    .then(async answers =>{
+        const employees = await dataFromDb.selectEmployeesByManager(answers.managerId);
+        console.table(await employees);
+        init();
+    }
+        )
+}
 
-
+async function viewEmployeesByDepartment(){
+    const departments =  await dataFromDb.getAllDepartments();
+    const departmentsOptions = departments.map(({ id, name }) => ({ name: name, value: id }));
+    inquirer.prompt(
+        [
+            {   
+                type: 'list',
+                message: "Select the department",
+                name: 'departmentId',
+                choices: departmentsOptions,
+            },
+        ]
+    )
+    .then(async answers =>{
+        const employees = await dataFromDb.selectEmployeesByDepartment(answers.departmentId);
+        console.table(await employees);
+        init();
+    }
+        )
+}
