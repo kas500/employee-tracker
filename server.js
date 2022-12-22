@@ -2,6 +2,7 @@ const dataFromDb = require("./js/queries");
 const cTable = require('console.table');
 const inquirer = require('inquirer');
 const {questions} = require('./js/helper');
+const Department = require('./lib/Deparment');
 
 async function init() {
     inquirer.prompt(
@@ -29,6 +30,8 @@ async function init() {
                 return  viewAllRoles();
             case questions[3]:
                 return viewAllEmployees();
+            case questions[4]:
+                return addDepartment();    
             default:
                 break;
         }
@@ -56,5 +59,21 @@ async function viewAllRoles(){
     init();
 }
 
+async function addDepartment(){
+    inquirer.prompt(
+        [
+            {
+                type: 'input',
+                message: questions[9],
+                name: 'departmentName',
+            }
+        ]
+    )
+    .then(answer =>{
+        dataFromDb.insertToDepartment(new Department(answer.departmentName));
+        init();
+    })
+
+}
 
 
